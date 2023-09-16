@@ -1,10 +1,12 @@
-//My mane code that I submitted on time on the repository:exaple_github_project and brance:practice
+//My main code that I submitted for the live test on time on the repository:example_github_project and branch:practice
 
-//In hurry I pushed the other branch link please cheach the branch:practice
+//In hurry I pushed the other branch link please check the branch:practice
 
 //https://github.com/TasnimSariaa/exaple_github_project/blob/practice/lib/main.dart
 
-//please cheak that link I submitted on time
+//please check that link I submitted on time
+
+//As a beginner github user please consider me for the last time
 
 import 'package:flutter/material.dart';
 
