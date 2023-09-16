@@ -16,41 +16,50 @@ class MyApp extends StatelessWidget {
 }
 
 class HomeScreen extends StatelessWidget {
+  List<String> items = [
+    'Bananas',
+    'Milk',
+    'Bread',
+    'bag',
+    'shoes',
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.amber,
-      appBar: AppBar(
-        backgroundColor: Colors.purple,
-        centerTitle: true,
-        title: Text("home screen"),
-        leading: Icon(
-          Icons.home,
-          color: Colors.black12,
-          size: 40,
-        ), //Icon constructor Icons class home static mathod
-      ),
-      body: Row(
-        children: [
-          Text(
-            'home',
-            style: TextStyle(//we cant use TextStyle as widget couse its not a widget its a diagonosticable helper of a widget
-                color: Colors.white,
-                fontSize: 40,
-                fontWeight: FontWeight.bold
+        appBar: AppBar(
+            title: Text(
+              "My Shopping List",
+              style: TextStyle(
+                fontWeight: FontWeight.w300,
+                fontSize: 35,
+              ),
             ),
-          ),
-          Text(
-            'home',
-            style: TextStyle(//we cant use TextStyle as widget couse its not a widget its a diagonosticable helper of a widget
-                color: Colors.white,
-                fontSize: 40,
-                fontWeight: FontWeight.bold
-            ),
-          ),
-          Icon(Icons.access_alarms_rounded),
-        ],
-      ),
-    );
+            //titleSpacing: 90,
+            centerTitle: true,
+            toolbarHeight: 70,
+            elevation: 70,
+            toolbarOpacity: 1,
+            backgroundColor: Colors.blue,
+            actions: [
+              IconButton(
+                icon: Icon(Icons.shopping_cart_rounded),
+                iconSize: 35,
+                onPressed: () {
+                  print("Shopping");
+                },
+              ),
+            ]),
+        body: Scrollbar(
+          child: ListView.builder(
+              itemCount: items.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Text(items[index]),
+                  leading: IconButton(
+                      onPressed: () {}, icon: Icon(Icons.shopping_basket)),
+                );
+              }),
+        ));
   }
 }
