@@ -157,10 +157,11 @@ class CartPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Cart Page"),
+        title: Text("Cart"),
+        centerTitle: true,
       ),
       body: Center(
-        child: Text("Total Products Bought: ${getTotalCount()}"),
+        child: Text("Total Products: ${getTotalCount()}"),
       ),
     );
   }
