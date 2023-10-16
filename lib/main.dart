@@ -1,320 +1,231 @@
 import 'package:flutter/material.dart';
-//import 'package:live_class_project/home_screen.dart';
-
-/// Todo_Application
-/// CRUD - Create, Read, Update, Delete
 
 void main() {
-  runApp(const TodoApp());
-}
-//n
-
-class UpdateTaskModal extends StatefulWidget {
-  const UpdateTaskModal(
-      {super.key, required this.todo, required this.onTodoUpdate});
-
-  final Todo todo;
-  final Function(String) onTodoUpdate;
-
-  @override
-  State<UpdateTaskModal> createState() => _UpdateTaskModalState();
+  runApp(MyApp());
 }
 
-class _UpdateTaskModalState extends State<UpdateTaskModal> {
-  late TextEditingController todoTEController;
-
-  @override
-  void initState() {
-    super.initState();
-    todoTEController = TextEditingController(text: widget.todo.tittle);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                'Update todo',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              IconButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                icon: const Icon(Icons.close),
-              ),
-            ],
-          ),
-          const SizedBox(
-            height: 24,
-          ),
-          TextFormField(
-            controller: todoTEController,
-            maxLines: 4,
-            decoration: const InputDecoration(
-              hintText: 'Enter your todo here',
-              enabledBorder: OutlineInputBorder(),
-              focusedBorder: OutlineInputBorder(),
-            ),
-          ),
-          const SizedBox(
-            height: 16,
-          ),
-          SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  widget.onTodoUpdate(todoTEController.text.trim());
-                  Navigator.pop(context);
-                },
-                child: const Text('Update'),
-              ))
-        ],
-      ),
-    );
-  }
-}
-
-//t
-class Todo {
-  String tittle;
+class TodoItem {
+  String title;
   String description;
 
-  Todo({
-    required this.tittle,
-    required this.description,
-  });
-}
-//1
-
-class AddNewTaskModal extends StatefulWidget {
-  const AddNewTaskModal({
-    super.key,
-    required this.onAddTap,
-  });
-
-  final Function(Todo) onAddTap;
-
-  @override
-  State<AddNewTaskModal> createState() => _AddNewTaskModalState();
+  TodoItem(this.title, this.description);
 }
 
-class _AddNewTaskModalState extends State<AddNewTaskModal> {
-  final TextEditingController todoTEController = TextEditingController();
-  final TextEditingController todoTEController2 = TextEditingController();
-
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
+class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  'Add new todo',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                IconButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  icon: const Icon(Icons.close),
-                ),
-              ],
-            ),
-            const SizedBox(
-              height: 24,
-            ),
-            TextFormField(
-              //maxLines: 4,
-              controller: todoTEController,
-              decoration: const InputDecoration(
-                hintText: 'Enter your todo here',
-                enabledBorder: OutlineInputBorder(),
-                focusedBorder: OutlineInputBorder(),
-              ),
-              validator: (String? value) {
-                if (value?.isEmpty ?? true) {
-                  return 'Enter a value';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(
-              height: 24,
-            ),
-            const SizedBox(
-              height: 16,
-            ),
-            SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      Todo todo = Todo(
-                        tittle: todoTEController.text.trim(),
-                        description: todoTEController2.text.trim(),
-                      );
-
-                      widget.onAddTap(todo);
-                      Navigator.pop(context);
-                    }
-                  },
-                  child: const Text('Add'),
-                ))
-          ],
-        ),
-      ),
-    );
-  }
-}
-//
-
-class TodoApp extends StatelessWidget {
-  const TodoApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: _HomeScreen(),
+    return MaterialApp(
+      home: TodoList(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
 
-class _HomeScreen extends StatefulWidget {
-  const _HomeScreen({super.key});
-
+class TodoList extends StatefulWidget {
   @override
-  State<_HomeScreen> createState() => _HomeScreenState();
+  _TodoListState createState() => _TodoListState();
 }
 
-class _HomeScreenState extends State<_HomeScreen> {
-  List<Todo> todoList = [];
+class _TodoListState extends State<TodoList> {
+  final titleController = TextEditingController();
+  final descriptionController = TextEditingController();
+  List<TodoItem> todos = [];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Todos'),
+        actions: [
+          Icon(
+            Icons.search,
+            color: Colors.blue,
+          )
+        ],
+        backgroundColor: Colors.white,
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          showModalBottomSheet(
-            context: context,
-            builder: (context) {
-              return AddNewTaskModal(
-                onAddTap: (Todo task) {
-                  addTodo(task);
-                },
-              );
-            },
-          );
-        },
-        child: const Icon(Icons.add),
-      ),
-      body: ListView.separated(
-        itemCount: todoList.length,
-        itemBuilder: (context, index) {
-          final Todo todo = todoList[index];
-          //final String formattedDate =
-          //DateFormat('hh:mm a dd-MM-yy').format(todo.createdDateTime);
-          return ListTile(
-            //tileColor: todo.status == 'done' ? Colors.grey : null, // ternary
-            onTap: () {
-              showDialog(
-                  context: context,
-                  builder: (context) {
-                    return AlertDialog(
-                      title: const Text('Actions'),
-                      content: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          ListTile(
-                            leading: const Icon(Icons.edit),
-                            title: const Text('Update'),
-                            onTap: () {
-                              Navigator.pop(context);
-                              showModalBottomSheet(
-                                  context: context,
-                                  builder: (context) {
-                                    return UpdateTaskModal(
-                                      todo: todo,
-                                      onTodoUpdate:
-                                          (String updatedDetailsText) {
-                                        updateTodo(index, updatedDetailsText);
-                                      },
-                                    );
-                                  });
-                            },
-                          ),
-                          const Divider(
-                            height: 0,
-                          ),
-                          ListTile(
-                            leading: const Icon(Icons.delete_outline),
-                            title: const Text('Delete'),
-                            onTap: () {
-                              deleteTodo(index);
-                              Navigator.pop(context);
-                            },
-                          ),
-                        ],
+
+      body: Column(
+        children: [
+          Flexible(
+            flex: 20,
+            child: Container(
+              // padding: const EdgeInsets.all(16.0),
+              margin: EdgeInsets.all(10),
+              child: Column(
+                children: [
+                  Container(
+                    margin: EdgeInsets.all(5),
+                    child: TextField(
+                      controller: titleController,
+                      decoration: const InputDecoration(
+                        hintText: 'Add title',
+                        enabledBorder: OutlineInputBorder(),
+                        focusedBorder: OutlineInputBorder(),
                       ),
-                    );
-                  });
-            },
-            onLongPress: () {
-              //String currentStatus = todo.status == 'pending' ? 'done' : 'pending';
-              //updateTodoStatus(index, currentStatus);
-            },
-            leading: CircleAvatar(
-              child: Text('${index + 1}'),
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.all(5),
+                    child: TextField(
+                      controller: descriptionController,
+                      decoration: const InputDecoration(
+                        hintText: 'Add description',
+                        enabledBorder: OutlineInputBorder(),
+                        focusedBorder: OutlineInputBorder(),
+                      ),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        final title = titleController.text;
+                        final description = descriptionController.text;
+                        if (title.isNotEmpty) {
+                          todos.add(TodoItem(title, description));
+                          titleController.clear();
+                          descriptionController.clear();
+                        }
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                    ),
+                    child: Text('Add'),
+                  ),
+                ],
+              ),
             ),
-            title: Text(todoList[index].tittle),
-            subtitle: Text(todoList[index].description),
-          );
-        },
-        separatorBuilder: (BuildContext context, int index) {
-          return const Divider(
-            height: 4,
-          );
-        },
+          ),
+          Expanded(
+            flex: 55,
+            child: ListView.builder(
+              itemCount: todos.length,
+              itemBuilder: (context, index) {
+                final item = todos[index];
+                return Container(
+                  margin: EdgeInsets.all(4),
+                  child: ListTile(
+                    tileColor: Colors.black12,
+                    leading: CircleAvatar(
+                      backgroundColor: Colors.red,
+                    ),
+                    title: Text(item.title),
+                    trailing: Icon(Icons.arrow_forward),
+                    subtitle: Text(item.description),
+                    onLongPress: () {
+                      _showEditDeleteDialog(context, item, index);
+                    },
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  void addTodo(Todo todo) {
-    todoList.add(todo);
-    setState(() {});
+  void _showEditDeleteDialog(BuildContext context, TodoItem item, int index) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Alert',style: TextStyle(fontWeight: FontWeight.bold),),
+          actions: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    _showEditBottomModalSheet(context, item, index);
+                  },
+                  child: Text('Edit',style: TextStyle(color: Colors.blue),),
+                ),
+                TextButton(
+                  onPressed: () {
+                    setState(() {
+                      todos.removeAt(index);
+                    });
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('Delete',style: TextStyle(color: Colors.blue),),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+  void _showEditBottomModalSheet(BuildContext context, TodoItem item, int index) {
+    String editTitle = item.title;
+    String editDescription = item.description;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        return SingleChildScrollView(
+          child: Container(
+            height: 300,
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(height: 50,),
+                Container(
+                  margin: EdgeInsets.all(5),
+                  child: TextField(
+                    controller: TextEditingController(text: item.title),
+                    onChanged: (text) {
+                      editTitle = text;
+                    },
+                    decoration: const InputDecoration(
+                      hintText: 'Update title',
+                      enabledBorder: OutlineInputBorder(),
+                      focusedBorder: OutlineInputBorder(),
+                    ),
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.all(5),
+                  child: TextField(
+                    controller: TextEditingController(text: item.description),
+                    onChanged: (text) {
+                      editDescription = text;
+                    },
+                    decoration: const InputDecoration(
+                      hintText: 'Update description',
+                      enabledBorder: OutlineInputBorder(),
+                      focusedBorder: OutlineInputBorder(),
+                    ),
+                  ),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      todos[index].title = editTitle;
+                      todos[index].description = editDescription;
+                    });
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('Edit done'),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
-  void deleteTodo(int index) {
-    todoList.removeAt(index);
-    setState(() {});
-  }
 
-  void updateTodo(int index, String todoDetails) {
-    todoList[index].tittle = todoDetails;
-    todoList[index].description = todoDetails;
 
-    setState(() {});
-  }
-
-  void updateTodoStatus(int index, String status) {
-    todoList[index].description = status;
-    setState(() {});
-  }
 }
